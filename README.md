@@ -4,4 +4,6 @@ Paint X-ray surface brightness profile and projected 2D temperature profile for 
 
 ##### Usage
 
-./sbprof example.cfg
+`make` to compile
+
+`./sbprof example.cfg` to run. Check example.cfg for parameters
