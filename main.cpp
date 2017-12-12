@@ -2,11 +2,13 @@
 #include <fstream>
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 #include "cosmo.h"
 #include "cluster.h"
 #include "gas_model.h"
-#include "read_lightcone.h"
+#include "io/read_halo.h"
 #include "xray.h"
+#include "ConfigParser/ConfigParser.h"
 
 #define MAXBINS 500
 
@@ -26,10 +28,20 @@ void temperature_projection (double* rbins, double* r_in, double* r_out, double*
 
 using namespace std;
 int main(int argc, char *argv[]){
-    if ( argc!=3 ){
+    /*if ( argc!=3 ){
         fprintf(stderr,"usage: %s <directory containing halo catalog> <halo catalog id>\n", argv[0]);
         exit(1);
-    } 
+	}*/
+    if ( argc!=2 ){
+        fprintf(stderr,"usage: %s <config file>\n", argv[0]);
+        exit(1);
+    }
+    
+    read_config(argv[1]);
+    char *file_format = config_get_string("io","file_format");
+    char *root = config_get_string("io","directory");
+    char *halo_run = config_get_string("io","haloid");
+
 
     //float H0 = 67.27, Omega_M = 0.3156, Omega_b = 0.04917;
     float H0 = 70.0, Omega_M = 0.2791, Omega_b = 0.04917;
@@ -52,8 +64,8 @@ int main(int argc, char *argv[]){
     int relation = 3; // concentration relation
     float rcutoff = 2.0;
 
-    char halo_run[256];
-    char root[1024], filename[1024], outprofname[1024], outhaloname[1024];
+    //char halo_run[256];
+    char filename[1024], outprofname[1024], outhaloname[1024];
     float xpos, ypos, zpos, L;
     double x, Rmax, Pgas, rho, rhogas, Yanl, Ypart, m_p;
     gsl_integration_glfixed_table *t;
@@ -78,11 +90,19 @@ int main(int argc, char *argv[]){
     sprintf(outhaloname, "sbhalo_run%s.txt", halo_run);
     sprintf(outprofname, "sbprof_run%s.txt", halo_run);
 
-    sprintf(filename, "%s/run%s.h_halo", root, halo_run);
     halo_list *halos;
     halo_struct *halo;
-
-    halos = load_halo_run(filename);
+    if (strcmp(file_format,"rockstar")==0) {
+	halos = load_halo_rs(filename);
+    }
+    else if (strcmp(file_format,"lightcone")==0) {
+	sprintf(filename, "%s/run%s.h_halo", root, halo_run);
+	halos = load_halo_run(filename);
+    }
+    else {
+	fprintf(stderr,"Not a supported file format for halo catalog.\n");
+        exit(1);
+    }
     if(halos == NULL ){
         printf("!memory allocation failure\n");
         exit(1);
@@ -94,7 +114,12 @@ int main(int argc, char *argv[]){
     outprof = fopen (outprofname, "w");
     outhalo = fopen (outhaloname, "w");
 
-    fprintf(outhalo,"# halo_id lens_plane_id theta_x theta_y redshift M500 [Msun] R500 Rvir Rscale [Mpc]\n");
+    if (strcmp(file_format,"rockstar")==0) {
+	fprintf(outhalo,"#ID PID X Y Z[Mpc] redshift Rvir Rs R500[kpc] Mvir M200c M500c[Msun] Xoff\n");
+    }
+    else if (strcmp(file_format,"lightcone")==0) {
+	fprintf(outhalo,"# halo_id lens_plane_id theta_x theta_y redshift M500 [Msun] R500 Rvir Rscale [Mpc]\n");
+    }
     fprintf(outprof,"# r_in r_mid r_out [Mpc] ang_in ang_mid ang_out [arcsecs] Sx [cts/s/cm^2/arcsec^2] kT_projected [keV]\n");
     for( i=0; i < halos->num_halos; i++){
     //for( i=0; i < 100; i++){
@@ -184,8 +209,15 @@ int main(int argc, char *argv[]){
         emission_projection(rbins, r_in, r_out,  emiss_prof, sb_prof, nbins); 
         // 2D projected emission-weighted temperature 
         temperature_projection(rbins, r_in, r_out, kT, kT_2D, emiss_prof, nbins); 
-        
-        fprintf(outhalo,"%d %d %d %d %f %e %f %f %f\n", i, halo->lens_id, halo->theta_x, halo->theta_y, Redshift, M500, R500, Rvir, Rscale);
+    
+	if (strcmp(file_format,"rockstar")==0) {
+	    fprintf(outhalo,"%d %d %f %f %f %f %f %f %f %e %e %e %f \n",halo->id,halo->pid,halo->x,halo->y,halo->z,halo->redshift,Rvir,Rscale,R500,
+		    halo->Mvir/h,halo->M200c/h,halo->M500c/h,halo->Xoff);
+	}
+	else if (strcmp(file_format,"lightcone")==0) {
+	    fprintf(outhalo,"%d %d %d %d %f %e %f %f %f\n", i, halo->lens_id, halo->theta_x, halo->theta_y, Redshift, M500, R500, Rvir, Rscale);
+	}
+
         fprintf(outprof,"# %d\n", i);
         for (j = 0; j < nbins; j++) {
             fprintf(outprof,"%f %f %f %f %f %f %e %e\n", r_in[j], rbins[j], r_out[j], ang_in[j], angbins[j], ang_out[j], sb_prof[j]/solid_angle[j], kT_2D[j]);
@@ -194,6 +226,7 @@ int main(int argc, char *argv[]){
     fclose(outhalo);
     fclose(outprof);
     destroy_halo_list(halos);
+
     return 0;
 }
 

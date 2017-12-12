@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 #include <stdlib.h>
-#include "read_lightcone.h"
+#include "read_halo.h"
 
 using namespace std;
 
