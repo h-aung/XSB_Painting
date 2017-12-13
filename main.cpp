@@ -40,7 +40,7 @@ int main(int argc, char *argv[]){
     read_config(argv[1]);
     char *file_format = config_get_string("io","file_format");
     char *root = config_get_string("io","directory");
-    char *halo_run = config_get_string("io","haloid");
+    char *halo_run = config_get_string("io","identifier");
 
 
     //float H0 = 67.27, Omega_M = 0.3156, Omega_b = 0.04917;
@@ -85,8 +85,8 @@ int main(int argc, char *argv[]){
     int i, j;
     FILE *outprof, *outhalo;
 
-    sprintf(outhaloname, "sbhalo_run%s.txt", halo_run);
-    sprintf(outprofname, "sbprof_run%s.txt", halo_run);
+    sprintf(outhaloname, "sbhalo_run_%s.txt", halo_run);
+    sprintf(outprofname, "sbprof_run_%s.txt", halo_run);
 
     halo_list *halos;
     halo_struct *halo;
@@ -149,7 +149,8 @@ int main(int argc, char *argv[]){
         cosmic_t0 = cosm_model.cosmic_time(0.0);
         E = cosm_model.Efact(Redshift);
 
-        Mvir = halo->Mvir/h;
+	if (halo->Mvir < 1) Mvir = (4.0/3.0)*M_PI*cosm_model.Delta_vir(Redshift)*cosm_model.calc_rho_crit(Redshift)*pow(halo->rvir/(1000.0*h),3.0);
+	else Mvir = halo->Mvir/h;
         cluster nfwclus(Mvir, Redshift, overden_id, relation, cosm_model);
 
         // Here, use halo concentration from the halo catalog instead of the M-c relation from Duffy+08
@@ -211,7 +212,7 @@ int main(int argc, char *argv[]){
     
 	if (strcmp(file_format,"rockstar")==0) {
 	    fprintf(outhalo,"%ld %d %f %f %f %f %f %f %f %e %e %e %f \n",halo->id,halo->pid,halo->x,halo->y,halo->z,halo->redshift,Rvir,Rscale,R500,
-		    halo->Mvir/h,halo->M200c/h,halo->M500c/h,halo->Xoff);
+		    Mvir,halo->M200c/h,halo->M500c/h,halo->Xoff);
 	}
 	else if (strcmp(file_format,"lightcone")==0) {
 	    fprintf(outhalo,"%d %d %d %d %f %e %f %f %f\n", i, halo->lens_id, halo->theta_x, halo->theta_y, Redshift, M500, R500, Rvir, Rscale);

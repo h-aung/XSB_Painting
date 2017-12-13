@@ -48,7 +48,7 @@ halo_list *load_halo_rs ( const char *filename ) {
 	    halos->list[i].redshift = (1/scale)-1;
             halos->list[i].rvir = r;
             halos->list[i].rs = rs;
-            halos->list[i].Mvir = M200c;
+            halos->list[i].Mvir = 0.0;
 	    halos->list[i].M500c = M500c;
             halos->list[i].M200c = M200c;
 	    halos->list[i].Xoff = Xoff;
