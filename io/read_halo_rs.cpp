@@ -9,6 +9,7 @@ using namespace std;
 halo_list *load_halo_rs ( const char *filename ) {
     int i;
     int halo_count = 0;
+    int comment_lines = 0;
     string line;
 
     long id, pid;
@@ -16,12 +17,18 @@ halo_list *load_halo_rs ( const char *filename ) {
 
     halo_list *halos;
 
+    cout << "Reading from File: " << filename << endl;
     ifstream file(filename);
 
     if (file.is_open()) {
-        while (getline(file, line))
-            ++halo_count;
-
+        while (getline(file, line)){
+	    if (line[0]!='#'){
+		++halo_count;
+	    }
+	    else {
+		++comment_lines;
+	    }
+	}
         cout << "Number of halos: " << halo_count << endl;
         halos = (halo_list *)malloc(sizeof(halo_list));
         halos->num_halos = halo_count;
@@ -30,9 +37,9 @@ halo_list *load_halo_rs ( const char *filename ) {
 
         file.clear();
         file.seekg(0, ios::beg);
-
+	for (i = 0; i < comment_lines; i++ ) getline(file, line); 
         for (i = 0; i < halos->num_halos; i++) {
-            file >> id >> scale >> pid >> r >> x >> y >> z >> M200c >> M500c >> Xoff;
+            file >> id >> scale >> pid >> r >> x >> y >> z >> M200c >> M500c >> Xoff >> rs;
             halos->list[i].id = id;
             halos->list[i].pid = pid;
             halos->list[i].x = x;
@@ -50,8 +57,9 @@ halo_list *load_halo_rs ( const char *filename ) {
         file.close();
 
     } else {
-        cout << "Unable to open file" << endl;
+        cout << "Unable to open file : " <<  filename << endl;
         exit(1);
     }
+
     return halos;
 }

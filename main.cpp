@@ -85,15 +85,13 @@ int main(int argc, char *argv[]){
     int i, j;
     FILE *outprof, *outhalo;
 
-    sprintf(root, "%s", argv[1]);
-    sprintf(halo_run, "%s", argv[2]);
     sprintf(outhaloname, "sbhalo_run%s.txt", halo_run);
     sprintf(outprofname, "sbprof_run%s.txt", halo_run);
 
     halo_list *halos;
     halo_struct *halo;
     if (strcmp(file_format,"rockstar")==0) {
-	halos = load_halo_rs(filename);
+	halos = load_halo_rs(root);
     }
     else if (strcmp(file_format,"lightcone")==0) {
 	sprintf(filename, "%s/run%s.h_halo", root, halo_run);
@@ -121,11 +119,12 @@ int main(int argc, char *argv[]){
 	fprintf(outhalo,"# halo_id lens_plane_id theta_x theta_y redshift M500 [Msun] R500 Rvir Rscale [Mpc]\n");
     }
     fprintf(outprof,"# r_in r_mid r_out [Mpc] ang_in ang_mid ang_out [arcsecs] Sx [cts/s/cm^2/arcsec^2] kT_projected [keV]\n");
+
     for( i=0; i < halos->num_halos; i++){
     //for( i=0; i < 100; i++){
         halo = &(halos->list[i]);
         if(halo->M500c/h < M500_THRESHOLD) continue;
-        
+
         for (j = 0; j < MAXBINS; j++) {
             rbins[j] = 0.0;
             r_in[j] = 0.0;
@@ -211,14 +210,14 @@ int main(int argc, char *argv[]){
         temperature_projection(rbins, r_in, r_out, kT, kT_2D, emiss_prof, nbins); 
     
 	if (strcmp(file_format,"rockstar")==0) {
-	    fprintf(outhalo,"%d %d %f %f %f %f %f %f %f %e %e %e %f \n",halo->id,halo->pid,halo->x,halo->y,halo->z,halo->redshift,Rvir,Rscale,R500,
+	    fprintf(outhalo,"%ld %d %f %f %f %f %f %f %f %e %e %e %f \n",halo->id,halo->pid,halo->x,halo->y,halo->z,halo->redshift,Rvir,Rscale,R500,
 		    halo->Mvir/h,halo->M200c/h,halo->M500c/h,halo->Xoff);
 	}
 	else if (strcmp(file_format,"lightcone")==0) {
 	    fprintf(outhalo,"%d %d %d %d %f %e %f %f %f\n", i, halo->lens_id, halo->theta_x, halo->theta_y, Redshift, M500, R500, Rvir, Rscale);
 	}
 
-        fprintf(outprof,"# %d\n", i);
+        fprintf(outprof,"# %ld\n", halo->id);
         for (j = 0; j < nbins; j++) {
             fprintf(outprof,"%f %f %f %f %f %f %e %e\n", r_in[j], rbins[j], r_out[j], ang_in[j], angbins[j], ang_out[j], sb_prof[j]/solid_angle[j], kT_2D[j]);
         }
