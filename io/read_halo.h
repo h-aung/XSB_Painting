@@ -26,6 +26,7 @@ typedef struct {
 
 halo_list *load_halo_run ( const char *filename );
 halo_list *load_halo_rs ( const char *filename );
+halo_list *load_halo_simple ( const char *filename );
 void destroy_halo_list (halo_list *halos);
 
 #endif

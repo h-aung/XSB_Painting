@@ -24,7 +24,7 @@ Apec/%.o: Apec/%.c Apec/%.h
 	$(CC) $(CFLAGS) $(FCOCO) $(FLINE) -I. -I./Apec -c $< -o $@
 
 sbprof: main.cpp gas_model.o read_halo xray.o ConfigParser.o $(APEC_OBJS)
-	$(CXX) $(CXXFLAGS) -o sbprof main.cpp gas_model.o xray.o read_halo_rs.o read_lightcone.o ConfigParser.o $(APEC_OBJS) $(CLIBS) 
+	$(CXX) $(CXXFLAGS) -o sbprof main.cpp gas_model.o xray.o read_halo_rs.o read_lightcone.o read_halo_simple.o ConfigParser.o $(APEC_OBJS) $(CLIBS) 
 
 xray.o: xray.c xray.h
 	$(CC) $(CFLAGS) -c xray.c
@@ -32,8 +32,8 @@ xray.o: xray.c xray.h
 gas_model.o: gas_model.cpp gas_model.h
 	$(CXX) $(CXXFLAGS) -c gas_model.cpp
 
-read_halo: io/read_lightcone.cpp io/read_halo_rs.cpp  io/read_halo.h
-	$(CXX) $(CXXFLAGS) -c io/read_lightcone.cpp io/read_halo_rs.cpp
+read_halo: io/read_lightcone.cpp io/read_halo_rs.cpp io/read_halo_simple.cpp io/read_halo.h
+	$(CXX) $(CXXFLAGS) -c io/read_lightcone.cpp io/read_halo_rs.cpp io/read_halo_simple.cpp
 
 ConfigParser.o: ConfigParser/ConfigParser.c ConfigParser/ConfigParser.h
 	$(CC) -c ConfigParser/ConfigParser.c

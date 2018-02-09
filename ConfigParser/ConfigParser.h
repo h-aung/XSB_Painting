@@ -1,10 +1,10 @@
 #ifndef __CONFIGPARSER__
 #define __CONFIGPARSER__
 
-int num;
-char ** section;
-char ** key;
-char ** params;
+int config_num;
+char ** config_section;
+char ** config_key;
+char ** config_params;
 
 #ifdef __cplusplus
 extern "C" void read_config(char *filename);

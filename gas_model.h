@@ -253,6 +253,23 @@ DeltaT/T = sigma_T/c * v_los * zeta * int dl rho_gas
         //findxs();// now can calculation radius within which stellar mass is contained
         R500toRvir= r500/radius;
     }
+	
+	//use the defnition here
+	/*
+    void set_nfw_params_noc( float m500, float z, double rhocrit) { // set the NFW parameters
+		
+        mass = bmass; // Mvir [Msol]
+        radius = bradius; // Rvir [Mpc]
+        C = conc; // cvir_Mpc
+        rhoi = brhoi; // NFW density at NFW scale radius [Msol/Mpc^3]
+        ri = radius/C; // NFW scale radius [Mpc]
+        //cout<< mass<<" "<<ri<<endl;
+        ri = ri*mpc/1000.0; //in km (for later units)
+        // SO after calling this, ri is always in units km!
+        vcmax = sqrt(4.0*PI*G*rhoi*ri*ri*Gmax()); //% in km/s
+        //findxs();// now can calculation radius within which stellar mass is contained
+        R500toRvir= r500/radius;
+    }*/
 
     void set_mgas_init(float baryon_frac_univ) {
         mgas = (baryon_frac_univ)*mass/(1.0+f_s);
@@ -974,7 +991,7 @@ double calc_gas_density(double r, float R500){
   return rhogas;
 }
 
-double calc_Y(float R500, float Rvir, double Rmax){
+double calc_Y(float R500, double Rmax){
     int nx = 1000;
     double res, x, w;
     gsl_integration_glfixed_table *t;
@@ -992,7 +1009,7 @@ double calc_Y(float R500, float Rvir, double Rmax){
     return res;
 }
 
-double calc_shell_Y(float R500, float Rvir, double rm, double rp){
+double calc_shell_Y(float R500, double rm, double rp){
     int nx = 100;
     double res, x, w, r;
     gsl_integration_glfixed_table *t;
@@ -1011,7 +1028,7 @@ double calc_shell_Y(float R500, float Rvir, double rm, double rp){
     return res;
 }
 
-double calc_shell_Y_Arnaud(float R500, float Rvir, double rm, double rp, double h, double E){
+double calc_shell_Y_Arnaud(float R500, double rm, double rp, double h, double E){
     int nx = 100;
     double res, x, w, r;
     gsl_integration_glfixed_table *t;

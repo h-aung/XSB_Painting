@@ -13,7 +13,7 @@ halo_list *load_halo_rs ( const char *filename ) {
     string line;
 
     long id, pid;
-    float r, x, y, z, M200c, M500c, Xoff, rs, scale;
+    float rvir, x, y, z, M200c, M500c, Xoff, rs, redshift, Mvir;
 
     halo_list *halos;
 
@@ -39,16 +39,16 @@ halo_list *load_halo_rs ( const char *filename ) {
         file.seekg(0, ios::beg);
 	for (i = 0; i < comment_lines; i++ ) getline(file, line); 
         for (i = 0; i < halos->num_halos; i++) {
-            file >> id >> scale >> pid >> r >> x >> y >> z >> M200c >> M500c >> Xoff >> rs;
+            file >> id >> pid >> redshift >> x >> y >> z >> rvir >> rs >> Mvir >> M200c >> M500c >> Xoff;
             halos->list[i].id = id;
             halos->list[i].pid = pid;
             halos->list[i].x = x;
             halos->list[i].y = y;
             halos->list[i].z = z;
-	    halos->list[i].redshift = (1/scale)-1;
-            halos->list[i].rvir = r;
+	    halos->list[i].redshift = redshift;
+            halos->list[i].rvir = rvir;
             halos->list[i].rs = rs;
-            halos->list[i].Mvir = 0.0;
+            halos->list[i].Mvir = Mvir;
 	    halos->list[i].M500c = M500c;
             halos->list[i].M200c = M200c;
 	    halos->list[i].Xoff = Xoff;
