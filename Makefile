@@ -1,6 +1,5 @@
 CC = icc
 CXX= icpc
-#CC = CC
 
 CFLAGS = -O2 
 CXXFLAGS = -O2 -std=c++11
@@ -11,10 +10,11 @@ CXXFLAGS = -O2 -std=c++11
 #CXXFLAGS += -DEXCLUDE_SUBHALOS
 CXXFLAGS += -DMASS_SELECTION=1e12
 #CXXFLAGS += -DROCKSTAR_CONCENTRATION
-CFLAGS += -I/usr/local/include -I/home/fas/nagai/etl28/Xrays/cfitsio
+CFITSDIR = /home/fas/nagai/etl28/Xrays/cfitsio
+CFLAGS += -I/usr/local/include -I$(CFITSDIR)
 CXXFLAGS += -I/usr/local/include
 
-CLIBS = -lgsl -lgslcblas -lm -L/home/fas/nagai/etl28/Xrays/cfitsio -lcfitsio
+CLIBS = -lgsl -lgslcblas -lm -L$(CFITSDIR) -lcfitsio
 
 APEC_SRCS = Apec.c atomdb_make_spectrum.c calc_continuum.c calc_lines.c messages.c readapec.c read_continuum_data.c read_fits_spectrum.c read_line_data.c read_parameters.c gaussianLine.c
 

@@ -12,7 +12,7 @@
 
 #define MAXBINS 500
 
-#define M500_THRESHOLD 1e13
+#define M500_THRESHOLD 1e12
 
 double tarray[ntmax]; //keV
 double zarray[nzmax]; //Solar unit
