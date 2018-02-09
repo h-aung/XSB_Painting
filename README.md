@@ -7,3 +7,7 @@ Paint X-ray surface brightness profile and projected 2D temperature profile for 
 `make` to compile
 
 `./sbprof example.cfg` to run. Check example.cfg for parameters
+
+##### Concentration
+
+When `file_format = simple`, concentration-mass relation is assumed from Dutton, Maccio 2014, and c200c is then converted to c500c by assuming NFW profile.
