@@ -11,3 +11,12 @@ Paint X-ray surface brightness profile and projected 2D temperature profile for 
 ##### Concentration
 
 When `file_format = simple`, concentration-mass relation is assumed from Dutton, Maccio 2014, and c200c is then converted to c500c by assuming NFW profile.
+
+The input format for `file_format = simple` should have 3 columns as following:
+```
+id M500c[Msun/h] z
+0 1e14 0.0
+1 5.5e13 1.0
+```
+
+The outputs are in prof_run_[id].txt.
