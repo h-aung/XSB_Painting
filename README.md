@@ -17,7 +17,7 @@ Concentration-mass relation is assumed from Dutton, Maccio 2014, and c200c is th
 
 The input format for `file_format = simple` should have 3 columns as following:
 ```
-id M500c[Msun/h] z
+#id M500c[Msun/h] z
 0 1e14 0.0
 1 5.5e13 1.0
 ```
